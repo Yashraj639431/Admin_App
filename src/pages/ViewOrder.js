@@ -1,0 +1,88 @@
+import React, { useEffect } from "react";
+import { Table } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { getOrderByUser } from "../features/auth/authSlice";
+import { Link, useLocation } from "react-router-dom";
+import { BiEdit } from "react-icons/bi";
+import { AiOutlineDelete } from "react-icons/ai";
+
+const columns = [
+  {
+    title: "SNo.",
+    dataIndex: "key",
+  },
+  {
+    title: "Product",
+    dataIndex: "name",
+  },
+  {
+    title: "Brand",
+    dataIndex: "brand",
+  },
+  {
+    title: "Count",
+    dataIndex: "count",
+  },
+  {
+    title: "Color",
+    dataIndex: "color",
+  },
+  {
+    title: "Amount",
+    dataIndex: "amount",
+  },
+  {
+    title: "Date",
+    dataIndex: "date",
+  },
+  {
+    title: "Action",
+    dataIndex: "action",
+  },
+];
+
+const ViewOrders = () => {
+  const location = useLocation();
+  const userId = location.pathname.split("/")[3];
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getOrderByUser(userId));
+
+  }, [dispatch, userId]);
+
+  const orderState = useSelector((state) => state.auth.orderbyuser[0].products);
+  const data1 = [];
+  for (let i = 0; i < orderState.length; i++) {
+    data1.push({
+      key: i + 1,
+      name: orderState[i].product.title,
+      brand: orderState[i].product.brand,
+      count: orderState[i].count,
+      color: orderState[i].color,
+      amount: orderState[i].product.price,
+      date: new Date(orderState[i].product.createdAt).toLocaleString(),
+      action: (
+        <>
+          <Link to="/" className="fs-4">
+            <BiEdit />
+          </Link>
+          <Link className="ms-3 text-danger fs-4" to="/">
+            <AiOutlineDelete />
+          </Link>
+        </>
+      ),
+    });
+  }
+
+  return (
+    <div>
+      <h3 className="mb-4 title">View Order</h3>
+      <div>
+        <Table columns={columns} dataSource={data1} />
+      </div>
+    </div>
+  );
+};
+
+export default ViewOrders;
